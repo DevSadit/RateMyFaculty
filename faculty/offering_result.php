@@ -1,0 +1,164 @@
+<?php
+declare(strict_types=1);
+
+require_once __DIR__ . '/../config/app.php';
+require_once __DIR__ . '/../config/database.php';
+require_once __DIR__ . '/../includes/validation.php';
+require_once __DIR__ . '/../includes/auth.php';
+require_once __DIR__ . '/../includes/authorization.php';
+require_once __DIR__ . '/../includes/evaluation_window.php';
+require_once __DIR__ . '/../includes/release_rule.php';
+
+start_app_session();
+$user = require_role('faculty');
+
+$stmt = $pdo->prepare('SELECT faculty_id FROM faculty WHERE user_id = :user_id');
+$stmt->execute([':user_id' => $user['user_id']]);
+$facultyRow = $stmt->fetch();
+if ($facultyRow === false) {
+    http_response_code(500);
+    die('Faculty profile not found.');
+}
+$facultyId = (int) $facultyRow['faculty_id'];
+
+$offeringId = validate_positive_int($_GET['offering_id'] ?? null);
+if ($offeringId === null) {
+    header('Location: dashboard.php');
+    exit;
+}
+
+// Ownership + release check FIRST, using only metadata (IDs, counts,
+// dates) — no rating/comment content is queried until BOTH pass.
+$stmt = $pdo->prepare(
+    'SELECT co.offering_id, co.section, co.faculty_id, c.course_code, c.course_title,
+            sem.semester_name, sem.year, sem.evaluation_open_at, sem.evaluation_close_at,
+            (SELECT COUNT(*) FROM evaluations e WHERE e.offering_id = co.offering_id) AS response_count
+     FROM course_offerings co
+     JOIN courses c ON c.course_id = co.course_id
+     JOIN semesters sem ON sem.semester_id = co.semester_id
+     WHERE co.offering_id = :offering_id'
+);
+$stmt->execute([':offering_id' => $offeringId]);
+$offering = $stmt->fetch();
+
+if ($offering === false || (int) $offering['faculty_id'] !== $facultyId) {
+    // Same "not found" whether the offering doesn't exist or belongs
+    // to a different faculty member — don't confirm/deny other IDs.
+    http_response_code(404);
+    die('Offering not found.');
+}
+
+$windowStatus = get_window_status($offering['evaluation_open_at'], $offering['evaluation_close_at']);
+$responseCount = (int) $offering['response_count'];
+$released = is_result_released($windowStatus, $responseCount);
+
+$averages = null;
+$comments = [];
+
+if ($released) {
+    $avgStmt = $pdo->prepare(
+        'SELECT AVG(teaching_quality) AS avg_teaching, AVG(communication) AS avg_communication,
+                AVG(punctuality) AS avg_punctuality, AVG(helpfulness) AS avg_helpfulness,
+                AVG(overall_rating) AS avg_overall
+         FROM evaluations WHERE offering_id = :offering_id'
+    );
+    $avgStmt->execute([':offering_id' => $offeringId]);
+    $averages = $avgStmt->fetch();
+
+    $commentStmt = $pdo->prepare(
+        "SELECT comment FROM evaluations
+         WHERE offering_id = :offering_id AND comment IS NOT NULL AND comment <> ''
+         ORDER BY evaluation_id"
+    );
+    $commentStmt->execute([':offering_id' => $offeringId]);
+    $comments = $commentStmt->fetchAll(PDO::FETCH_COLUMN);
+}
+?>
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="theme-color" content="#f6f7fb">
+    <title>Offering Results</title>
+    <link rel="stylesheet" href="<?php echo e(BASE_URL); ?>/assets/css/style.css">
+    <script src="<?php echo e(BASE_URL); ?>/assets/js/app.js" defer></script>
+</head>
+
+<body class="result-page">
+    <!-- UI REDESIGN: Shared light workspace, static role navigation and accessible content landmark. -->
+    <a class="skip-link" href="#main-content">Skip to main content</a>
+    <aside class="sidebar" aria-label="Faculty workspace">
+        <div class="brand"><span class="brand-mark"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons.svg#book"></use></svg></span><span>RateMyFaculty</span></div>
+        <span class="brand-subtitle">A better learning experience</span>
+        <div class="nav-label">Your workspace</div>
+        <nav aria-label="Main navigation"><a class="nav-link" href="dashboard.php" aria-current="page"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons.svg#grid"></use></svg><span>My offerings</span></a>
+            <a class="nav-link" href="summary.php"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons.svg#chart"></use></svg><span>Overall summary</span></a></nav>
+        <div class="sidebar-note"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons.svg#book"></use></svg><strong>Every perspective matters.</strong>Thoughtful feedback. Better teaching.<br>A stronger academic community.</div>
+    </aside>
+    <div class="workspace">
+        <header class="topbar"><div class="topbar-path">Faculty workspace<span aria-hidden="true">/</span><strong>Offering results</strong></div><span class="workspace-tag">Faculty portal</span></header>
+        <main class="main-content" id="main-content" tabindex="-1">
+    <p class="back-link"><a href="dashboard.php">&laquo; Back to My Offerings</a></p>
+    <p class="eyebrow">Offering results</p>
+    <h1><?php echo e($offering['course_code'] . ' — ' . $offering['course_title']); ?></h1>
+    <p class="page-description">Student feedback, brought together in one clear view.</p>
+    <p class="context-line"><?php echo e($offering['semester_name'] . ' ' . $offering['year'] . ', Section ' . $offering['section']); ?></p>
+
+    <?php if (!$released): ?>
+        <p>
+            <?php if ($windowStatus !== WINDOW_CLOSED): ?>
+                Results are not available while the evaluation window is still open.
+            <?php else: ?>
+                Results are not available — fewer than <?php echo RELEASE_THRESHOLD; ?> responses were submitted.
+            <?php endif; ?>
+        </p>
+    <?php else: ?>
+        <h2>Summary</h2>
+        <p class="metric-line">Total responses: <strong><?php echo $responseCount; ?></strong></p>
+        <!-- UI REDESIGN: Focusable table region supports keyboard scrolling on smaller screens. -->
+    <div class="table-region" role="region" aria-label="Offering results table" tabindex="0"><table class="summary-table">
+            <tr>
+                <th scope="col">Criterion</th>
+                <th scope="col">Average</th>
+            </tr>
+            <tr>
+                <td>Teaching Quality</td>
+                <td><?php echo e(number_format((float) $averages['avg_teaching'], 2)); ?></td>
+            </tr>
+            <tr>
+                <td>Communication</td>
+                <td><?php echo e(number_format((float) $averages['avg_communication'], 2)); ?></td>
+            </tr>
+            <tr>
+                <td>Punctuality</td>
+                <td><?php echo e(number_format((float) $averages['avg_punctuality'], 2)); ?></td>
+            </tr>
+            <tr>
+                <td>Helpfulness</td>
+                <td><?php echo e(number_format((float) $averages['avg_helpfulness'], 2)); ?></td>
+            </tr>
+            <tr>
+                <td>Overall Rating</td>
+                <td><?php echo e(number_format((float) $averages['avg_overall'], 2)); ?></td>
+            </tr>
+        </table></div>
+
+        <h2>Anonymous Comments</h2>
+        <?php if (empty($comments)): ?>
+            <p class="empty-state">No written comments were submitted.</p>
+        <?php else: ?>
+            <ul class="comment-list">
+                <?php foreach ($comments as $c): ?>
+                    <li><?php echo e($c); ?></li>
+                <?php endforeach; ?>
+            </ul>
+        <?php endif; ?>
+    <?php endif; ?>
+        </main>
+        <footer class="page-footer"><span>RateMyFaculty</span><span>Better learning starts with listening.</span></footer>
+    </div>
+</body>
+
+</html>
