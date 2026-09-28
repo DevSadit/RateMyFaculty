@@ -21,8 +21,6 @@ if ($studentRow === false) {
 }
 $studentId = (int)$studentRow['student_id'];
 
-// Deliberately selects NOTHING from the `evaluations` table — RMF-050 forbids
-// showing any rating/comment content here, and RMF-053 forbids read-back.
 $stmt = $pdo->prepare(
     'SELECT en.status AS enrollment_status,
             co.offering_id, co.section,
@@ -56,7 +54,6 @@ $alreadyNotice = isset($_GET['already']) && $_GET['already'] === '1';
     <script src="<?php echo e(BASE_URL); ?>/assets/js/app.js" defer></script>
 </head>
 <body class="app-page">
-    <!-- UI REDESIGN: Shared light workspace, static role navigation and accessible content landmark. -->
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <aside class="sidebar" aria-label="Student workspace">
         <div class="brand"><span class="brand-mark"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons.svg#book"></use></svg></span><span>RateMyFaculty</span></div>
@@ -84,7 +81,6 @@ $alreadyNotice = isset($_GET['already']) && $_GET['already'] === '1';
         <p role="alert" style="color:red;">You had already submitted an evaluation for that offering.</p>
     <?php endif; ?>
 
-    <!-- UI REDESIGN: Focusable table region supports keyboard scrolling on smaller screens. -->
     <div class="table-region" role="region" aria-label="My courses table" tabindex="0"><table class="data-table">
         <tr>
             <th scope="col">Course</th><th scope="col">Faculty</th><th scope="col">Semester</th><th scope="col">Section</th>

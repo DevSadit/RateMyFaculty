@@ -225,7 +225,6 @@ $students = $pdo->query(
 </head>
 
 <body class="app-page">
-    <!-- UI REDESIGN: Shared light workspace, static role navigation and accessible content landmark. -->
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <aside class="sidebar" aria-label="Administration">
         <div class="brand"><span class="brand-mark"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons.svg#book"></use></svg></span><span>RateMyFaculty</span></div>
@@ -255,7 +254,6 @@ $students = $pdo->query(
     <?php if ($successMessage !== ''): ?>
         <p role="status" style="color:green;"><?php echo e($successMessage); ?></p><?php endif; ?>
 
-    <!-- UI REDESIGN: Unified management form panel. -->
     <section class="panel editor-panel"><h2><?php echo $editStudent ? 'Edit Student' : 'Add New Student'; ?></h2>
 
     <form class="editor-form" method="post" action="students.php">
@@ -294,7 +292,6 @@ $students = $pdo->query(
     </div></form></section>
 
     <h2>All Students</h2>
-    <!-- UI REDESIGN: Focusable table region supports keyboard scrolling on smaller screens. -->
     <div class="table-region" role="region" aria-label="Students table" tabindex="0"><table class="data-table">
         <tr>
             <th scope="col">Username</th>

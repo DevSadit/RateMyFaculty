@@ -15,17 +15,12 @@ $user = require_role('admin');
 $errors = [];
 $successMessage = '';
 
-/**
- * Converts an HTML <input type="datetime-local"> value ("2026-11-01T09:00")
- * into MySQL DATETIME format. Returns null if the format is invalid.
- */
 function parse_datetime_local(string $value): ?string
 {
     $dt = DateTimeImmutable::createFromFormat('Y-m-d\TH:i', $value);
     return $dt === false ? null : $dt->format('Y-m-d H:i:s');
 }
 
-/** Converts a stored MySQL DATETIME back into datetime-local input format. */
 function to_datetime_local(?string $mysqlDatetime): string
 {
     if ($mysqlDatetime === null) {
@@ -131,7 +126,6 @@ $semesters = $pdo->query('SELECT * FROM semesters ORDER BY year DESC, semester_n
 </head>
 
 <body class="app-page">
-    <!-- UI REDESIGN: Shared light workspace, static role navigation and accessible content landmark. -->
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <aside class="sidebar" aria-label="Administration">
         <div class="brand"><span class="brand-mark"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons.svg#book"></use></svg></span><span>RateMyFaculty</span></div>
@@ -165,7 +159,6 @@ $semesters = $pdo->query('SELECT * FROM semesters ORDER BY year DESC, semester_n
 
     <?php $locked = $editSemester !== null && (int) $editSemester['is_locked'] === 1; ?>
 
-    <!-- UI REDESIGN: Unified management form panel. -->
     <section class="panel editor-panel"><h2><?php echo $editSemester ? 'Edit Semester' : 'Add New Semester'; ?></h2>
     <?php if ($locked): ?>
         <p class="context-line"><em>This semester is locked — unlock it below before editing.</em></p>
@@ -203,7 +196,6 @@ $semesters = $pdo->query('SELECT * FROM semesters ORDER BY year DESC, semester_n
     <?php endif; ?></section>
 
     <h2>All Semesters</h2>
-    <!-- UI REDESIGN: Focusable table region supports keyboard scrolling on smaller screens. -->
     <div class="table-region" role="region" aria-label="Semesters table" tabindex="0"><table class="data-table">
         <tr>
             <th scope="col">Name</th>

@@ -1,7 +1,3 @@
-// Small usability helpers, loaded on every page. Nothing here is
-// required for the app to work — if this file failed to load, every
-// form and link would still function exactly as before.
-
 document.addEventListener("DOMContentLoaded", function () {
   makeAlertsDismissible();
   wrapWideTables();
@@ -9,8 +5,6 @@ document.addEventListener("DOMContentLoaded", function () {
   preventDoubleSubmit();
 });
 
-// The red/green <p> messages already printed by PHP get a close
-// button, and the green ones fade out on their own after a bit.
 function makeAlertsDismissible() {
   var alerts = document.querySelectorAll(
     'p[style*="color: red"], p[style*="color:red"], p[style*="color: green"], p[style*="color:green"]',
@@ -35,8 +29,6 @@ function makeAlertsDismissible() {
   });
 }
 
-// Tables can get wide (Admin has a lot of columns) — wrap them so
-// they scroll sideways on a small screen instead of breaking layout.
 function wrapWideTables() {
   document.querySelectorAll("table").forEach(function (table) {
     var wrapper = document.createElement("div");
@@ -46,8 +38,6 @@ function wrapWideTables() {
   });
 }
 
-// The evaluation comment box is the only textarea with a maxlength,
-// so this just quietly does nothing on every other page.
 function addCommentCounter() {
   var textarea = document.querySelector("textarea[maxlength]");
   if (!textarea) return;
@@ -66,8 +56,6 @@ function addCommentCounter() {
   update();
 }
 
-// Stop a slow connection (or an impatient double-click) from
-// submitting the same form twice.
 function preventDoubleSubmit() {
   document.querySelectorAll("form").forEach(function (form) {
     form.addEventListener("submit", function () {

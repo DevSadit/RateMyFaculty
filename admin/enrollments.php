@@ -62,9 +62,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         if ($enrollmentId === null) {
             $errors[] = 'Invalid enrollment.';
         } else {
-            // Re-check on the server that no evaluation was ever submitted for this
-            // student/offering pair — never trust that the Delete button was only
-            // shown because the UI thought it was safe.
             $check = $pdo->prepare(
                 'SELECT en.student_id, en.offering_id,
                         (SELECT COUNT(*) FROM submission_receipts sr
@@ -102,9 +99,6 @@ $offeringOptions = $pdo->query(
      ORDER BY sem.year DESC, sem.semester_name, c.course_code, co.section"
 )->fetchAll();
 
-// Subquery example (also useful for RMF-103's SQL demonstration set):
-// for each enrollment, count whether a submission receipt exists,
-// without needing a separate query per row.
 $enrollments = $pdo->query(
     "SELECT en.enrollment_id, en.status, en.student_id, en.offering_id,
             s.full_name AS student_name, s.student_number,
@@ -132,7 +126,6 @@ $enrollments = $pdo->query(
 </head>
 
 <body class="app-page">
-    <!-- UI REDESIGN: Shared light workspace, static role navigation and accessible content landmark. -->
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <aside class="sidebar" aria-label="Administration">
         <div class="brand"><span class="brand-mark"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons.svg#book"></use></svg></span><span>RateMyFaculty</span></div>
@@ -162,7 +155,6 @@ $enrollments = $pdo->query(
     <?php if ($successMessage !== ''): ?>
         <p role="status" style="color:green;"><?php echo e($successMessage); ?></p><?php endif; ?>
 
-    <!-- UI REDESIGN: Unified management form panel. -->
     <section class="panel editor-panel"><h2>Add Enrollment</h2>
     <form class="editor-form" method="post" action="enrollments.php">
         <?php echo csrf_field(); ?>
@@ -192,7 +184,6 @@ $enrollments = $pdo->query(
     </div></form></section>
 
     <h2>All Enrollments</h2>
-    <!-- UI REDESIGN: Focusable table region supports keyboard scrolling on smaller screens. -->
     <div class="table-region" role="region" aria-label="Enrollments table" tabindex="0"><table class="data-table">
         <tr>
             <th scope="col">Student</th>

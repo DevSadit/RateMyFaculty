@@ -22,8 +22,6 @@ if ($facultyRow === false) {
 }
 $facultyId = (int)$facultyRow['faculty_id'];
 
-// Own offerings only (enforced in WHERE, not just hidden in the UI).
-// Response COUNT only — no rating/comment content selected here at all.
 $stmt = $pdo->prepare(
     'SELECT co.offering_id, co.section, c.course_code, c.course_title,
             sem.semester_name, sem.year, sem.evaluation_open_at, sem.evaluation_close_at,
@@ -48,7 +46,6 @@ $offerings = $stmt->fetchAll();
     <script src="<?php echo e(BASE_URL); ?>/assets/js/app.js" defer></script>
 </head>
 <body class="app-page">
-    <!-- UI REDESIGN: Shared light workspace, static role navigation and accessible content landmark. -->
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <aside class="sidebar" aria-label="Faculty workspace">
         <div class="brand"><span class="brand-mark"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons.svg#book"></use></svg></span><span>RateMyFaculty</span></div>
@@ -71,7 +68,6 @@ $offerings = $stmt->fetchAll();
             <button type="submit">Log out</button>
         </form></div>
 
-    <!-- UI REDESIGN: Focusable table region supports keyboard scrolling on smaller screens. -->
     <div class="table-region" role="region" aria-label="My offerings table" tabindex="0"><table class="data-table">
         <tr><th scope="col">Course</th><th scope="col">Semester</th><th scope="col">Section</th><th scope="col">Window</th><th scope="col">Responses</th><th scope="col">Result Status</th><th scope="col">Action</th></tr>
         <?php foreach ($offerings as $o):

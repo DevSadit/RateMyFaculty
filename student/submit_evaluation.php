@@ -34,9 +34,6 @@ if ($offeringId === null) {
     exit;
 }
 
-// Full re-check, independent of whatever the form page showed. Never
-// trust that reaching this handler means the earlier check still holds —
-// it could be stale, a forged request, or a duplicate tab.
 $eligibility = get_offering_eligibility($pdo, $studentId, $offeringId);
 if (!$eligibility['eligible']) {
     ?>
@@ -53,7 +50,6 @@ if (!$eligibility['eligible']) {
     </head>
 
     <body class="error-page">
-    <!-- UI REDESIGN: Shared light workspace, static role navigation and accessible content landmark. -->
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <aside class="sidebar" aria-label="Student workspace">
         <div class="brand"><span class="brand-mark"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons.svg#book"></use></svg></span><span>RateMyFaculty</span></div>
@@ -112,7 +108,6 @@ if (!empty($formErrors)) {
     </head>
 
     <body class="error-page">
-    <!-- UI REDESIGN: Shared light workspace, static role navigation and accessible content landmark. -->
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <aside class="sidebar" aria-label="Student workspace">
         <div class="brand"><span class="brand-mark"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons.svg#book"></use></svg></span><span>RateMyFaculty</span></div>
@@ -142,17 +137,11 @@ if (!empty($formErrors)) {
 try {
     $pdo->beginTransaction();
 
-    // Identity-bearing receipt FIRST. If this fails (e.g. a race between
-    // two near-simultaneous requests from the same student), we roll back
-    // before ever touching `evaluations` — so a rejected duplicate can
-    // never leave behind an orphaned anonymous evaluation row.
     $receiptStmt = $pdo->prepare(
         'INSERT INTO submission_receipts (student_id, offering_id) VALUES (:student_id, :offering_id)'
     );
     $receiptStmt->execute([':student_id' => $studentId, ':offering_id' => $offeringId]);
 
-    // Anonymous content SECOND, same transaction, with NO reference to
-    // $studentId anywhere in this query.
     $evalStmt = $pdo->prepare(
         'INSERT INTO evaluations
             (offering_id, teaching_quality, communication, punctuality, helpfulness, overall_rating, comment)

@@ -1,16 +1,9 @@
--- =========================================================
--- RateMyFaculty — Complete Database Schema
--- Consolidated from RMF-010 through RMF-015
--- =========================================================
 CREATE DATABASE IF NOT EXISTS ratemyfaculty CHARACTER
 SET
     utf8mb4 COLLATE utf8mb4_general_ci;
 
 USE ratemyfaculty;
 
--- ---------------------------------------------------------
--- users
--- ---------------------------------------------------------
 CREATE TABLE
     users (
         user_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -23,9 +16,6 @@ CREATE TABLE
         CONSTRAINT uq_users_username UNIQUE (username)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
--- ---------------------------------------------------------
--- students
--- ---------------------------------------------------------
 CREATE TABLE
     students (
         student_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -38,9 +28,6 @@ CREATE TABLE
         CONSTRAINT fk_students_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE RESTRICT ON UPDATE CASCADE
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
--- ---------------------------------------------------------
--- faculty
--- ---------------------------------------------------------
 CREATE TABLE
     faculty (
         faculty_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -53,9 +40,6 @@ CREATE TABLE
         CONSTRAINT fk_faculty_user FOREIGN KEY (user_id) REFERENCES users (user_id) ON DELETE RESTRICT ON UPDATE CASCADE
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
--- ---------------------------------------------------------
--- courses
--- ---------------------------------------------------------
 CREATE TABLE
     courses (
         course_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -66,9 +50,6 @@ CREATE TABLE
         CONSTRAINT uq_courses_code UNIQUE (course_code)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
--- ---------------------------------------------------------
--- semesters
--- ---------------------------------------------------------
 CREATE TABLE
     semesters (
         semester_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -82,9 +63,6 @@ CREATE TABLE
         CONSTRAINT chk_semesters_window CHECK (evaluation_open_at < evaluation_close_at)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
--- ---------------------------------------------------------
--- course_offerings
--- ---------------------------------------------------------
 CREATE TABLE
     course_offerings (
         offering_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -99,9 +77,6 @@ CREATE TABLE
         CONSTRAINT fk_offerings_faculty FOREIGN KEY (faculty_id) REFERENCES faculty (faculty_id) ON DELETE RESTRICT ON UPDATE CASCADE
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
--- ---------------------------------------------------------
--- enrollments
--- ---------------------------------------------------------
 CREATE TABLE
     enrollments (
         enrollment_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -114,9 +89,6 @@ CREATE TABLE
         CONSTRAINT fk_enrollments_offering FOREIGN KEY (offering_id) REFERENCES course_offerings (offering_id) ON DELETE RESTRICT ON UPDATE CASCADE
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
--- ---------------------------------------------------------
--- submission_receipts (identity-bearing, NO evaluation link)
--- ---------------------------------------------------------
 CREATE TABLE
     submission_receipts (
         student_id INT UNSIGNED NOT NULL,
@@ -127,9 +99,6 @@ CREATE TABLE
         CONSTRAINT fk_receipts_offering FOREIGN KEY (offering_id) REFERENCES course_offerings (offering_id) ON DELETE RESTRICT ON UPDATE CASCADE
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
--- ---------------------------------------------------------
--- evaluations (anonymous, NO student/user/enrollment link)
--- ---------------------------------------------------------
 CREATE TABLE
     evaluations (
         evaluation_id INT UNSIGNED AUTO_INCREMENT PRIMARY KEY,
@@ -149,9 +118,6 @@ CREATE TABLE
         CONSTRAINT chk_eval_overall_rating CHECK (overall_rating BETWEEN 1 AND 5)
     ) ENGINE = InnoDB DEFAULT CHARSET = utf8mb4;
 
--- ---------------------------------------------------------
--- audit_logs
--- ---------------------------------------------------------
 CREATE TABLE
     audit_logs (
         audit_id BIGINT UNSIGNED AUTO_INCREMENT PRIMARY KEY,

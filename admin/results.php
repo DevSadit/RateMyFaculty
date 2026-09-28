@@ -12,7 +12,6 @@ require_once __DIR__ . '/../includes/release_rule.php';
 start_app_session();
 $user = require_role('admin');
 
-// Same release rule, same function, as Faculty — no Admin-only branch.
 $stmt = $pdo->query(
     'SELECT co.offering_id, co.section, c.course_code, c.course_title,
             sem.semester_name, sem.year, sem.evaluation_open_at, sem.evaluation_close_at,
@@ -37,7 +36,6 @@ $offerings = $stmt->fetchAll();
     <script src="<?php echo e(BASE_URL); ?>/assets/js/app.js" defer></script>
 </head>
 <body class="app-page">
-    <!-- UI REDESIGN: Shared light workspace, static role navigation and accessible content landmark. -->
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <aside class="sidebar" aria-label="Administration">
         <div class="brand"><span class="brand-mark"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons.svg#book"></use></svg></span><span>RateMyFaculty</span></div>
@@ -62,7 +60,6 @@ $offerings = $stmt->fetchAll();
     <h1>Evaluation Results</h1>
     <p class="page-description">Explore result availability and released feedback across your campus.</p>
 
-    <!-- UI REDESIGN: Focusable table region supports keyboard scrolling on smaller screens. -->
     <div class="table-region" role="region" aria-label="Results table" tabindex="0"><table class="data-table">
         <tr><th scope="col">Course</th><th scope="col">Faculty</th><th scope="col">Semester</th><th scope="col">Section</th><th scope="col">Window</th><th scope="col">Responses</th><th scope="col">Result Status</th><th scope="col">Action</th></tr>
         <?php foreach ($offerings as $o):

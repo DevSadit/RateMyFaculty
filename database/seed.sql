@@ -1,14 +1,5 @@
--- =========================================================
--- RateMyFaculty — Seed / Demo Data
--- RMF-016
--- All demo accounts use password: Password123
--- For an existing import with the old hashes, run repair_demo_passwords.sql.
--- =========================================================
 USE ratemyfaculty;
 
--- ---------------------------------------------------------
--- Users (1 admin, 2 faculty, 5 students)
--- ---------------------------------------------------------
 INSERT INTO
     users (username, password_hash, role)
 VALUES
@@ -53,9 +44,6 @@ VALUES
         'student'
     );
 
--- ---------------------------------------------------------
--- Faculty profiles
--- ---------------------------------------------------------
 INSERT INTO
     faculty (user_id, faculty_code, full_name, designation)
 SELECT
@@ -80,9 +68,6 @@ FROM
 WHERE
     username = 'facnusrat';
 
--- ---------------------------------------------------------
--- Student profiles
--- ---------------------------------------------------------
 INSERT INTO
     students (user_id, student_number, full_name, batch)
 SELECT
@@ -143,9 +128,6 @@ FROM
 WHERE
     username = 'stu005';
 
--- ---------------------------------------------------------
--- Courses
--- ---------------------------------------------------------
 INSERT INTO
     courses (course_code, course_title, credit_hours)
 VALUES
@@ -156,10 +138,6 @@ VALUES
     ),
     ('CSE3111', 'Computer Networks', 3.0);
 
--- ---------------------------------------------------------
--- Semester — window already CLOSED, so we can demo released
--- vs suppressed results immediately without waiting.
--- ---------------------------------------------------------
 INSERT INTO
     semesters (
         semester_name,
@@ -177,11 +155,6 @@ VALUES
         1
     );
 
--- ---------------------------------------------------------
--- Course offerings
---   Offering A: CSE2222 / Fall 2026 / Section A / Mr. Rahman  -> will get 3 evaluations (released)
---   Offering B: CSE3111 / Fall 2026 / Section A / Ms. Nusrat  -> will get 2 evaluations (suppressed)
--- ---------------------------------------------------------
 INSERT INTO
     course_offerings (course_id, semester_id, faculty_id, section)
 SELECT
@@ -216,10 +189,6 @@ WHERE
     AND s.year = 2026
     AND f.faculty_code = 'FAC002';
 
--- ---------------------------------------------------------
--- Enrollments — all 5 students completed Offering A (CSE2222);
--- students 1-2 completed Offering B (CSE3111).
--- ---------------------------------------------------------
 INSERT INTO
     enrollments (student_id, offering_id, status)
 SELECT
@@ -254,11 +223,6 @@ WHERE
     c.course_code = 'CSE3111'
     AND st.student_number IN ('CSE-2024-101', 'CSE-2024-102');
 
--- ---------------------------------------------------------
--- Submission receipts + evaluations for Offering A (CSE2222)
--- 3 responses -> RELEASED once window is closed (it already is).
--- Receipts and evaluations are inserted with NO link between them.
--- ---------------------------------------------------------
 INSERT INTO
     submission_receipts (student_id, offering_id)
 SELECT
@@ -370,10 +334,6 @@ FROM
 WHERE
     c.course_code = 'CSE2222';
 
--- ---------------------------------------------------------
--- Submission receipts + evaluations for Offering B (CSE3111)
--- Only 2 responses -> stays SUPPRESSED even though window is closed.
--- ---------------------------------------------------------
 INSERT INTO
     submission_receipts (student_id, offering_id)
 SELECT

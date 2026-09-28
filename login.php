@@ -12,7 +12,6 @@ require_once __DIR__ . '/includes/auth.php';
 
 start_app_session();
 
-// Already logged in? Don't show the login form again.
 if (is_logged_in()) {
     $user = current_user();
     header('Location: ' . role_dashboard_url($user['role']));
@@ -36,8 +35,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $user = attempt_login($pdo, $username, $password);
 
         if ($user === null) {
-            // Deliberately identical message for "no such user" and
-            // "wrong password" — don't help an attacker enumerate accounts.
             $errorMessage = 'Invalid username or password.';
         } else {
             login_user($user);
@@ -60,7 +57,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body class="login-page">
-    <!-- UI REDESIGN: Light split layout; original authentication form is unchanged. -->
     <a class="skip-link" href="#main-content">Skip to login</a>
     <div class="login-layout">
         <aside class="login-story" aria-label="About RateMyFaculty"><div class="brand"><span class="brand-mark"><svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#book"></use></svg></span><span>RateMyFaculty</span></div><p class="eyebrow">A little feedback. A lasting impact.</p><h2>Better learning<br>starts with <span>you.</span></h2><p>A space for student perspectives, thoughtful reflection, and a stronger academic community.</p><img class="login-art" src="assets/feedback-illustration.svg" width="440" height="270" alt="" aria-hidden="true"><div class="story-footnote"><svg class="icon" aria-hidden="true" focusable="false"><use href="assets/icons.svg#book"></use></svg>Made for your academic community</div></aside>

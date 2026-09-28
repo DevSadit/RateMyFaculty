@@ -1,17 +1,7 @@
 <?php
 declare(strict_types=1);
 
-/**
- * RMF-020 / RMF-021: session lifecycle and login logic.
- * Requires $pdo to already be available (config/database.php)
- * when attempt_login() is called.
- */
 
-/**
- * Starts the session with basic hardened cookie params.
- * Call this once at the top of every page, before touching $_SESSION.
- * (Idle-timeout and secure-cookie-over-HTTPS are added in RMF-092.)
- */
 function start_app_session(): void
 {
     if (session_status() === PHP_SESSION_ACTIVE) {
@@ -25,12 +15,6 @@ function start_app_session(): void
     session_start();
 }
 
-/**
- * Looks up a username, verifies the password, and confirms the
- * account is active. Returns the user row on success, or null on
- * ANY failure (unknown username, wrong password, inactive account) —
- * the caller must not distinguish between these cases in its message.
- */
 function attempt_login(PDO $pdo, string $username, string $password): ?array
 {
     $stmt = $pdo->prepare(
@@ -55,12 +39,6 @@ function attempt_login(PDO $pdo, string $username, string $password): ?array
     return $user;
 }
 
-/**
- * Establishes the logged-in session for a verified user.
- * Regenerates the session ID first, so a session ID that existed
- * before login (e.g. handed out to an anonymous visitor) can never
- * be reused to hijack the now-authenticated session.
- */
 function login_user(array $user): void
 {
     session_regenerate_id(true);
@@ -69,9 +47,6 @@ function login_user(array $user): void
     $_SESSION['role'] = $user['role'];
 }
 
-/**
- * Fully destroys the session's authentication state.
- */
 function logout_user(): void
 {
     $_SESSION = [];
@@ -92,10 +67,6 @@ function logout_user(): void
     session_destroy();
 }
 
-/**
- * Returns the currently logged-in user's basic session info, or
- * null if nobody is logged in.
- */
 function current_user(): ?array
 {
     if (empty($_SESSION['user_id'])) {
@@ -113,9 +84,6 @@ function is_logged_in(): bool
     return current_user() !== null;
 }
 
-/**
- * Where a given role should land after logging in.
- */
 function role_dashboard_url(string $role): string
 {
     return match ($role) {

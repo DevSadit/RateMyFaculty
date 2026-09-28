@@ -32,9 +32,6 @@ if ($offering === false) {
     die('Offering not found.');
 }
 
-// Only student identity + whether a receipt exists. This query never
-// touches `evaluations` — it CANNOT reveal what any student answered,
-// only that they answered (or didn't).
 $stmt = $pdo->prepare(
     "SELECT s.student_number, s.full_name,
             CASE WHEN sr.student_id IS NOT NULL THEN 'Submitted' ELSE 'Pending' END AS submission_status
@@ -58,7 +55,6 @@ $students = $stmt->fetchAll();
     <script src="<?php echo e(BASE_URL); ?>/assets/js/app.js" defer></script>
 </head>
 <body class="app-page">
-    <!-- UI REDESIGN: Shared light workspace, static role navigation and accessible content landmark. -->
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <aside class="sidebar" aria-label="Administration">
         <div class="brand"><span class="brand-mark"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons.svg#book"></use></svg></span><span>RateMyFaculty</span></div>
@@ -85,7 +81,6 @@ $students = $stmt->fetchAll();
     <p class="context-line"><?php echo e($offering['semester_name'] . ' ' . $offering['year'] . ', Section ' . $offering['section'] . ' — ' . $offering['faculty_name']); ?></p>
     <p class="context-line"><em>Submission status only — this page never shows what any student answered.</em></p>
 
-    <!-- UI REDESIGN: Focusable table region supports keyboard scrolling on smaller screens. -->
     <div class="table-region" role="region" aria-label="Submission status table" tabindex="0"><table class="progress-detail-table">
         <tr><th scope="col">Student #</th><th scope="col">Name</th><th scope="col">Status</th></tr>
         <?php foreach ($students as $s): ?>

@@ -2,10 +2,8 @@
 declare(strict_types=1);
 
 define('APP_NAME', 'RateMyFaculty');
-define('APP_ENV', 'development'); // set to 'production' before real deployment
+define('APP_ENV', 'development');
 
-// Web root path of the project. Change this if you install RateMyFaculty
-// under a different folder name inside htdocs.
 define('BASE_URL', '/ratemyfaculty');
 
 ini_set('log_errors', '1');

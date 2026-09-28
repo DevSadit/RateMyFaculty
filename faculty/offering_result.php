@@ -27,8 +27,6 @@ if ($offeringId === null) {
     exit;
 }
 
-// Ownership + release check FIRST, using only metadata (IDs, counts,
-// dates) — no rating/comment content is queried until BOTH pass.
 $stmt = $pdo->prepare(
     'SELECT co.offering_id, co.section, co.faculty_id, c.course_code, c.course_title,
             sem.semester_name, sem.year, sem.evaluation_open_at, sem.evaluation_close_at,
@@ -42,8 +40,6 @@ $stmt->execute([':offering_id' => $offeringId]);
 $offering = $stmt->fetch();
 
 if ($offering === false || (int) $offering['faculty_id'] !== $facultyId) {
-    // Same "not found" whether the offering doesn't exist or belongs
-    // to a different faculty member — don't confirm/deny other IDs.
     http_response_code(404);
     die('Offering not found.');
 }
@@ -87,7 +83,6 @@ if ($released) {
 </head>
 
 <body class="result-page">
-    <!-- UI REDESIGN: Shared light workspace, static role navigation and accessible content landmark. -->
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <aside class="sidebar" aria-label="Faculty workspace">
         <div class="brand"><span class="brand-mark"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons.svg#book"></use></svg></span><span>RateMyFaculty</span></div>
@@ -117,7 +112,6 @@ if ($released) {
     <?php else: ?>
         <h2>Summary</h2>
         <p class="metric-line">Total responses: <strong><?php echo $responseCount; ?></strong></p>
-        <!-- UI REDESIGN: Focusable table region supports keyboard scrolling on smaller screens. -->
     <div class="table-region" role="region" aria-label="Offering results table" tabindex="0"><table class="summary-table">
             <tr>
                 <th scope="col">Criterion</th>

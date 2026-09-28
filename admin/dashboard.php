@@ -24,7 +24,6 @@ $user = require_role('admin');
 </head>
 
 <body class="app-page">
-    <!-- UI REDESIGN: Shared light workspace, static role navigation and accessible content landmark. -->
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <aside class="sidebar" aria-label="Administration">
         <div class="brand"><span class="brand-mark"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons.svg#book"></use></svg></span><span>RateMyFaculty</span></div>
@@ -44,7 +43,6 @@ $user = require_role('admin');
     <div class="workspace">
         <header class="topbar"><div class="topbar-path">Administration<span aria-hidden="true">/</span><strong>Overview</strong></div><span class="workspace-tag">Admin portal</span></header>
         <main class="main-content" id="main-content" tabindex="-1">
-    <!-- UI REDESIGN: Welcome panel and linked management cards. -->
     <section class="welcome-panel"><p class="eyebrow">Your academic workspace</p>
     <h1>Your campus, connected.</h1>
     <p class="page-description">Manage your academic community and keep every evaluation on track.</p>

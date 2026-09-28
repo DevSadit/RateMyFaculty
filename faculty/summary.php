@@ -42,10 +42,6 @@ foreach ($allOfferings as $o) {
 
 $summary = null;
 if (!empty($releasedOfferingIds)) {
-    // AVG() runs over every individual evaluation row from every released
-    // offering pooled together — NOT an average of each offering's
-    // already-rounded average. Those are mathematically different numbers
-    // whenever offerings have different response counts.
     $placeholders = implode(',', array_fill(0, count($releasedOfferingIds), '?'));
     $sql = "SELECT COUNT(*) AS total_evaluations,
                    AVG(teaching_quality) AS avg_teaching, AVG(communication) AS avg_communication,
@@ -70,7 +66,6 @@ if (!empty($releasedOfferingIds)) {
 </head>
 
 <body class="result-page">
-    <!-- UI REDESIGN: Shared light workspace, static role navigation and accessible content landmark. -->
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <aside class="sidebar" aria-label="Faculty workspace">
         <div class="brand"><span class="brand-mark"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons.svg#book"></use></svg></span><span>RateMyFaculty</span></div>
@@ -95,7 +90,6 @@ if (!empty($releasedOfferingIds)) {
     <?php else: ?>
         <p class="metric-line">Released offerings included: <strong><?php echo count($releasedOfferingIds); ?></strong></p>
         <p class="metric-line">Total evaluations included: <strong><?php echo (int) $summary['total_evaluations']; ?></strong></p>
-        <!-- UI REDESIGN: Focusable table region supports keyboard scrolling on smaller screens. -->
     <div class="table-region" role="region" aria-label="Overall summary table" tabindex="0"><table class="summary-table">
             <tr>
                 <th scope="col">Criterion</th>

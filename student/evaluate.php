@@ -45,7 +45,6 @@ if (!$eligibility['eligible']) {
     </head>
 
     <body class="error-page">
-    <!-- UI REDESIGN: Shared light workspace, static role navigation and accessible content landmark. -->
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <aside class="sidebar" aria-label="Student workspace">
         <div class="brand"><span class="brand-mark"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons.svg#book"></use></svg></span><span>RateMyFaculty</span></div>
@@ -86,7 +85,6 @@ $offering = $eligibility['offering'];
 </head>
 
 <body class="evaluation-page">
-    <!-- UI REDESIGN: Shared light workspace, static role navigation and accessible content landmark. -->
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <aside class="sidebar" aria-label="Student workspace">
         <div class="brand"><span class="brand-mark"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons.svg#book"></use></svg></span><span>RateMyFaculty</span></div>
@@ -107,7 +105,6 @@ $offering = $eligibility['offering'];
         <?php echo e($offering['section']); ?>
     </p>
 
-    <!-- UI REDESIGN: Existing submission guidance and native rating inputs. -->
     <div class="info-panel">
         <strong>Before you submit:</strong>
         <ul>

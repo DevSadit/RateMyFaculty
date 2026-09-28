@@ -43,8 +43,6 @@ $released = is_result_released($windowStatus, $responseCount);
 $averages = null;
 $comments = [];
 
-// Content is only ever queried once BOTH the window-closed AND
-// threshold checks pass — same rule, same function, as Faculty's page.
 if ($released) {
     $avgStmt = $pdo->prepare(
         'SELECT AVG(teaching_quality) AS avg_teaching, AVG(communication) AS avg_communication,
@@ -55,9 +53,6 @@ if ($released) {
     $avgStmt->execute([':offering_id' => $offeringId]);
     $averages = $avgStmt->fetch();
 
-    // Deliberately selects ONLY the comment text — no student_id, no
-    // enrollment_id, nothing that could be paired with an identity,
-    // because the evaluations table has no such column to select.
     $commentStmt = $pdo->prepare(
         "SELECT comment FROM evaluations
          WHERE offering_id = :offering_id AND comment IS NOT NULL AND comment <> ''
@@ -80,7 +75,6 @@ if ($released) {
 </head>
 
 <body class="result-page">
-    <!-- UI REDESIGN: Shared light workspace, static role navigation and accessible content landmark. -->
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <aside class="sidebar" aria-label="Administration">
         <div class="brand"><span class="brand-mark"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons.svg#book"></use></svg></span><span>RateMyFaculty</span></div>
@@ -117,7 +111,6 @@ if ($released) {
     <?php else: ?>
         <h2>Summary</h2>
         <p class="metric-line">Total responses: <strong><?php echo $responseCount; ?></strong></p>
-        <!-- UI REDESIGN: Focusable table region supports keyboard scrolling on smaller screens. -->
     <div class="table-region" role="region" aria-label="Offering results table" tabindex="0"><table class="summary-table">
             <tr>
                 <th scope="col">Criterion</th>

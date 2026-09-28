@@ -1,11 +1,6 @@
 <?php
 declare(strict_types=1);
 
-/**
- * RMF-015 / RMF-030 / RMF-031: single place that writes to audit_logs.
- * NEVER pass a password (plaintext or hashed) or evaluation content
- * into $details — only safe, human-readable summaries.
- */
 function log_admin_action(
     PDO $pdo,
     int $adminUserId,

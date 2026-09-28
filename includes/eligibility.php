@@ -1,11 +1,6 @@
 <?php
 declare(strict_types=1);
 
-/**
- * RMF-051 / RMF-052: single source of truth for "can this student
- * evaluate this offering right now?" Used by BOTH the form page and
- * the submission handler, so the rule can never drift between them.
- */
 function get_offering_eligibility(PDO $pdo, int $studentId, int $offeringId): array
 {
     $stmt = $pdo->prepare(

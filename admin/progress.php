@@ -10,9 +10,6 @@ require_once __DIR__ . '/../includes/authorization.php';
 start_app_session();
 $user = require_role('admin');
 
-// Purely operational counts. Deliberately never joins or selects
-// anything from `evaluations` — this page only ever needs to know
-// WHETHER a receipt exists, never what the content was.
 $stmt = $pdo->query(
     "SELECT co.offering_id, c.course_code, co.section, sem.semester_name, sem.year, f.full_name AS faculty_name,
             COUNT(DISTINCT CASE WHEN en.status = 'completed' THEN en.student_id END) AS eligible_count,
@@ -39,7 +36,6 @@ $offerings = $stmt->fetchAll();
     <script src="<?php echo e(BASE_URL); ?>/assets/js/app.js" defer></script>
 </head>
 <body class="app-page">
-    <!-- UI REDESIGN: Shared light workspace, static role navigation and accessible content landmark. -->
     <a class="skip-link" href="#main-content">Skip to main content</a>
     <aside class="sidebar" aria-label="Administration">
         <div class="brand"><span class="brand-mark"><svg class="icon" aria-hidden="true" focusable="false"><use href="../assets/icons.svg#book"></use></svg></span><span>RateMyFaculty</span></div>
@@ -65,7 +61,6 @@ $offerings = $stmt->fetchAll();
     <p class="page-description">Follow participation across course offerings and see what is still pending.</p>
     <p class="context-line"><em>This page shows submission status only — no ratings or comments.</em></p>
 
-    <!-- UI REDESIGN: Focusable table region supports keyboard scrolling on smaller screens. -->
     <div class="table-region" role="region" aria-label="Evaluation progress table" tabindex="0"><table class="data-table">
         <tr><th scope="col">Course</th><th scope="col">Faculty</th><th scope="col">Semester</th><th scope="col">Section</th><th scope="col">Eligible</th><th scope="col">Submitted</th><th scope="col">Pending</th><th scope="col">Response Rate</th><th scope="col">Action</th></tr>
         <?php foreach ($offerings as $o):
